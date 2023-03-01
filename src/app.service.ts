@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { ListAccessKeysCommand } from "@aws-sdk/client-iam"
+import { ListAccessKeysCommand, ListUsersCommand } from "@aws-sdk/client-iam"
 import { IAMClient } from "@aws-sdk/client-iam"
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
 import { join } from 'path'
@@ -55,26 +55,33 @@ export class AppService {
       region : env["AWS_REGION"]
     })
 
-    const params = { MaxItems: 100 };
+    const params = { MaxItems: 1000 };
 
     const hours = q?.period || 24 * 30
 
     const CurrentDate = new Date()
     const TartgetDate = new Date(CurrentDate.setHours(CurrentDate.getHours() - hours))
     
-    const data = await iamClient.send(new ListAccessKeysCommand(params))
-    const keysData = data.AccessKeyMetadata || [];
+    const users = await iamClient.send(new ListUsersCommand(params))
+   
+    const result = []
     
-    const result = keysData
-    .filter((key) => key.CreateDate < TartgetDate)
-    .map((key) => {
-      return {
-        UserName: key.UserName, 
-        AccessKeyID: key.AccessKeyId, 
-        CreateDate: key.CreateDate
+    await Promise.all(users.Users.map(async (user) => {
+      const data = await iamClient.send(new ListAccessKeysCommand({UserName: user.UserName}))
+      const keysData = data.AccessKeyMetadata || [];
+      
+      keysData.filter((key) => key.CreateDate < TartgetDate && key.Status == "Active")
+      .map((key) => {
+        result.push({
+          UserName: key.UserName, 
+          AccessKeyID: key.AccessKeyId, 
+          CreateDate: key.CreateDate
+        }
+        )
       }
-    })
-    return result;
+    )}))
+    
+    return result
   }
 }
 
