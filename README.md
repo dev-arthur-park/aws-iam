@@ -8,10 +8,10 @@ nest
 typescript
 ```
 
-## Installation
+## Pre Condition
 
 ```bash
-$ yarn install
+.env file을 본인 환경에 맞는 값으로 변경 함
 ```
 
 ## Running the app

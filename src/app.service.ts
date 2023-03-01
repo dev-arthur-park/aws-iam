@@ -3,6 +3,7 @@ import { ListAccessKeysCommand } from "@aws-sdk/client-iam"
 import { IAMClient } from "@aws-sdk/client-iam"
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
 import { join } from 'path'
+import * as dotenv from 'dotenv'
 
 @Injectable()
 export class AppService {
@@ -44,7 +45,16 @@ export class AppService {
   }
 
   private async getAwsAccesKeyList(q?: QueryType){
-    const iamClient = new IAMClient({})
+    const env = dotenv?.config()?.parsed
+    
+    const iamClient = new IAMClient({
+      credentials: {
+        accessKeyId:env["AWS_ACCESS_KEY"],
+        secretAccessKey: env["AWS_SECRET_KEY"]
+      },
+      region : env["AWS_REGION"]
+    })
+
     const params = { MaxItems: 100 };
 
     const hours = q?.period || 24 * 30
