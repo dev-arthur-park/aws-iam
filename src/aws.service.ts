@@ -1,14 +1,15 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable } from "@nestjs/common"
 import { ListAccessKeysCommand, ListUsersCommand } from "@aws-sdk/client-iam"
 import { IAMClient } from "@aws-sdk/client-iam"
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
-import { join } from 'path'
-import * as dotenv from 'dotenv'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs"
+import { join } from "path"
+import * as dotenv from "dotenv"
+import { QueryType } from "./libs/types"
 
 @Injectable()
-export class AppService {
-  getHello(): string {
-    return 'Hello World!';
+export class AWSService {
+  getAWS(): string {
+    return "AWS API Healthy!"
   }
 
   async list(q?: QueryType) {
@@ -31,15 +32,15 @@ export class AppService {
   }
 
   private async makefile(q: QueryType) {
-    const savePath = join(__dirname, "../resources");
-    const saveFileName = join(savePath, "result.txt");
+    const savePath = join(__dirname, "../resources")
+    const saveFileName = join(savePath, "result.txt")
     const saveData = await this.getAwsAccesKeyList(q)
     
     if (!existsSync(savePath)) {
-      mkdirSync(savePath, { recursive:true });
+      mkdirSync(savePath, { recursive:true })
     }
     
-    writeFileSync(saveFileName, JSON.stringify(saveData));
+    writeFileSync(saveFileName, JSON.stringify(saveData))
     
     return saveFileName
   }
@@ -55,12 +56,12 @@ export class AppService {
       region : env["AWS_REGION"]
     })
 
-    const params = { MaxItems: 1000 };
+    const params = { MaxItems: 1000 }
 
     const hours = q?.period || 24 * 30
 
-    const CurrentDate = new Date()
-    const TartgetDate = new Date(CurrentDate.setHours(CurrentDate.getHours() - hours))
+    const currentDate = new Date()
+    const tartgetDate = new Date(currentDate.setHours(currentDate.getHours() - hours))
     
     const users = await iamClient.send(new ListUsersCommand(params))
    
@@ -68,9 +69,9 @@ export class AppService {
     
     await Promise.all(users.Users.map(async (user) => {
       const data = await iamClient.send(new ListAccessKeysCommand({UserName: user.UserName}))
-      const keysData = data.AccessKeyMetadata || [];
+      const keysData = data.AccessKeyMetadata || []
       
-      keysData.filter((key) => key.CreateDate < TartgetDate && key.Status == "Active")
+      keysData.filter((key) => key.CreateDate < tartgetDate && key.Status == "Active")
       .map((key) => {
         result.push({
           UserName: key.UserName, 
@@ -83,10 +84,4 @@ export class AppService {
     
     return result
   }
-}
-
-export interface QueryType
-{
-  period?: number
-  type?: string // 시간이 아닌 년월일을 구분하려고 만들었음 
 }
