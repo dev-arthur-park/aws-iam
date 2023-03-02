@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: aws-iam-manage
+  labels:
+    app: aws-iam
+spec:
+  containers:
+  - name: aws-iam-container
+    image: #빌드된 도커파일 경로, 도커 허브를 추천 
+    ports:
+    - containerPort: 3000
