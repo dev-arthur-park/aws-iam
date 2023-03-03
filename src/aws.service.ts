@@ -58,7 +58,7 @@ export class AWSService {
 
     const params = { MaxItems: 1000 }
 
-    const hours = q?.period || 24 * 30
+    const hours = q?.hours || 24 * 30
 
     const currentDate = new Date()
     const tartgetDate = new Date(currentDate.setHours(currentDate.getHours() - hours))

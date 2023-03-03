@@ -30,13 +30,13 @@ $ yarn run start:prod
 ## API
 ```bash
 # /aws/list
-특정 시간 이전 생성된 AWS Accesskey를 Array 형태로 반환
+생성 후 일정 시간이 지난 AWS Accesskey를 Array 형태로 반환
 
 # /aws/download
-특정 시간 이전 생성된 AWS Accesskey를 file로 반환
+생성 후 일정 시간이 지난 AWS Accesskey를 file로 반환
 
 # queryparam
-period -> 시간 단위이며, 숫자만 허용. 미 입력시 24 * 30 시간(대략 한달)을 기본 값으로 함
+hours -> 생성 후 일정 시간이 지난 키를 찾기 위한 값, 숫자만 허용. 미 입력시 24 * 30 시간(대략 한달)을 기본 값으로 함
 ```
 
 ## Minikube 연결

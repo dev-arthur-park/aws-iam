@@ -13,7 +13,7 @@ export class AWSController {
 
   @Get("/list")
   async listAWSiAM(@Query() q: QueryType , @Res() res): Promise<any> {
-    if (q?.period && !Number(q?.period)) {
+    if (q?.hours && !Number(q?.hours)) {
       return res.send({
         status: 400, 
         message: "period 값은 숫자만 입력해야 합니다."
@@ -42,7 +42,7 @@ export class AWSController {
   @Get("/download")
   @Header("Content-type", "application/txt")
   async listAWSiAMtoFile(@Query() q: QueryType, @Res() res): Promise<{} | FileSystem> {
-    if (q?.period && !Number(q?.period)) {
+    if (q?.hours && !Number(q?.hours)) {
       return res.send({
         status: 400, 
         message: "period 값은 숫자만 입력해야 합니다."
