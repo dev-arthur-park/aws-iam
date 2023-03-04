@@ -1,6 +1,6 @@
-import { Controller, Get, Res, Query, Header } from "@nestjs/common"
+import { Controller, Get, Res, Query, Header, StreamableFile } from "@nestjs/common"
 import { AWSService } from "./aws.service"
-import { QueryType } from "./libs/types"
+import { AwsResponseResultType, QueryType } from "./libs/types"
 
 @Controller("aws")
 export class AWSController {
@@ -11,14 +11,17 @@ export class AWSController {
     return this.awsService.getAWS()
   }
 
+  /*
+  생성 후 일정 시간이 지난 aws acesskey를 가져오는 api
+  param:
+    hours -> 생성 후 지난 시점을 특정하기 위한 시간으로 값이 안 들어오면 24 * 30 시간(대략 한달)을 기본 값으로 사용
+  result:
+
+   */
   @Get("/list")
-  async listAWSiAM(@Query() q: QueryType , @Res() res): Promise<any> {
-    if (q?.hours && !Number(q?.hours)) {
-      return res.send({
-        status: 400, 
-        message: "period 값은 숫자만 입력해야 합니다."
-      })
-    }
+  async listAWSiAM(@Query() q: QueryType , @Res() res): Promise<AwsResponseResultType> {
+    const checkQueryParamResult = this.awsService.checkQueryParam(q)
+    if ( checkQueryParamResult)  return res.send(checkQueryParamResult)
 
     const reuslt = await this.awsService.list(q)
 
@@ -41,13 +44,9 @@ export class AWSController {
 
   @Get("/download")
   @Header("Content-type", "application/txt")
-  async listAWSiAMtoFile(@Query() q: QueryType, @Res() res): Promise<{} | FileSystem> {
-    if (q?.hours && !Number(q?.hours)) {
-      return res.send({
-        status: 400, 
-        message: "period 값은 숫자만 입력해야 합니다."
-      })
-    }
+  async listAWSiAMtoFile(@Query() q: QueryType, @Res() res): Promise<AwsResponseResultType | StreamableFile> {
+    const checkQueryParamResult = this.awsService.checkQueryParam(q)
+    if ( checkQueryParamResult)  return res.send(checkQueryParamResult)
     
     const reuslt = await this.awsService.download(q)
 
@@ -60,6 +59,6 @@ export class AWSController {
       )
     }
 
-    return await res.send(reuslt)
+    return res.send(reuslt)
   }
 }

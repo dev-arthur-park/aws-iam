@@ -3,9 +3,10 @@ AWS Accesskey 중 오래된 키를 가져오는 코드
 
 ## Base
 ```bash
-node js
-nest
+node.js
+nestjs
 typescript
+yarn
 ```
 
 ## Pre Condition
@@ -18,13 +19,13 @@ typescript
 
 ```bash
 # development
-$ yarn run start
+$ yarn start
 
 # watch mode
-$ yarn run start:dev
+$ yarn start:dev
 
 # production mode
-$ yarn run start:prod
+$ yarn start:prod
 ```
 
 ## API
@@ -36,7 +37,24 @@ $ yarn run start:prod
 생성 후 일정 시간이 지난 AWS Accesskey를 file로 반환
 
 # queryparam
-hours -> 생성 후 일정 시간이 지난 키를 찾기 위한 값, 숫자만 허용. 미 입력시 24 * 30 시간(대략 한달)을 기본 값으로 함
+{
+    hours?: number -> 생성 후 일정 시간이 지난 키를 찾기 위한 변수. 기본값은 24 * 30 시간(대략 한달)
+    statusType?: all | inactive | active -> 키 값의 상태별로 보기 위한 변수. 미 입력시 기본 값은 all
+}
+
+
+# result
+{
+    status: number
+    result?: [
+        {
+            UserName?: string,
+            AccessKeyID?: string,
+            CreateDate?: Date
+        }
+    ]
+    message?: string
+}
 ```
 
 ## Minikube 연결
